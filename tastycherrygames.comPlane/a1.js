@@ -1,5 +1,5 @@
 (function () {
-  const C = {
+  const mg_2_C = {
     transparentBackground: true,
     unityYellow: "#fbc02d",
     unityBlue: "#1e88e5",
@@ -9,15 +9,15 @@
     loadText: "Wait up... loading game"
   };
 
-  let canvas, ctx, raf, audio;
-  let score = 0, high = +localStorage.lgHS || 0;
-  let gameOver = false, run = true, prog = 0, frame = 0;
-  let finishAnim = false, finishFrame = 0;
+  let mg_2_canvas, mg_2_ctx, mg_2_raf, mg_2_audio;
+  let mg_2_score = 0, mg_2_high = +localStorage.lgHS || 0;
+  let mg_2_gameOver = false, mg_2_run = true, mg_2_prog = 0, mg_2_frame = 0;
+  let mg_2_finishAnim = false, mg_2_finishFrame = 0;
 
-  const ASPECT = 600 / 180;
-  let canvasWidth, canvasHeight, scale = 1;
+  const mg_2_ASPECT = 600 / 180;
+  let mg_2_canvasWidth, mg_2_canvasHeight, mg_2_scale = 1;
 
-  const G = {
+  const mg_2_G = {
     w: 600, h: 180,
     groundY: 140,
     y: 0, v: 0, g: 0.8, j: -12,
@@ -26,7 +26,7 @@
     bananas: []
   };
 
-  const minion = [
+  const mg_2_minion = [
     "0011111100",
     "0111111110",
     "1111111111",
@@ -36,244 +36,242 @@
     "0011111100"
   ];
 
-  function beep(f = 400, d = 0.05) {
-    audio ||= new AudioContext();
-    const o = audio.createOscillator();
-    const g = audio.createGain();
+  function mg_2_beep(f = 400, d = 0.05) {
+    mg_2_audio ||= new AudioContext();
+    const o = mg_2_audio.createOscillator();
+    const g = mg_2_audio.createGain();
     o.frequency.value = f;
     g.gain.value = 0.05;
     o.connect(g);
-    g.connect(audio.destination);
+    g.connect(mg_2_audio.destination);
     o.start();
-    o.stop(audio.currentTime + d);
+    o.stop(mg_2_audio.currentTime + d);
   }
 
-  function spawnObstacle() {
-    G.obs.push({ x: G.w + 200, w: 12, offset: Math.random() * 4 });
+  function mg_2_spawnObstacle() {
+    mg_2_G.obs.push({ x: mg_2_G.w + 200, w: 12, offset: Math.random() * 4 });
     if (Math.random() < 0.5)
-      G.bananas.push({ x: G.w + 260, y: G.groundY - 38 });
+      mg_2_G.bananas.push({ x: mg_2_G.w + 260, y: mg_2_G.groundY - 38 });
   }
 
-  function reset() {
-    G.y = G.v = 0;
-    G.speed = 5;
-    G.obs = [];
-    G.bananas = [];
-    score = 0;
-    gameOver = false;
-    finishAnim = false;
-    finishFrame = 0;
-    for (let i = 0; i < 3; i++) spawnObstacle();
+  function mg_2_reset() {
+    mg_2_G.y = mg_2_G.v = 0;
+    mg_2_G.speed = 5;
+    mg_2_G.obs = [];
+    mg_2_G.bananas = [];
+    mg_2_score = 0;
+    mg_2_gameOver = false;
+    mg_2_finishAnim = false;
+    mg_2_finishFrame = 0;
+    for (let i = 0; i < 3; i++) mg_2_spawnObstacle();
   }
 
-  function jump() {
-    if (gameOver) return reset();
-    if (G.y === 0) {
-      G.v = G.j;
-      beep(600);
+  function mg_2_jump() {
+    if (mg_2_gameOver) return mg_2_reset();
+    if (mg_2_G.y === 0) {
+      mg_2_G.v = mg_2_G.j;
+      mg_2_beep(600);
     }
   }
 
-  function drawMinion(x, y) {
+  function mg_2_drawMinion(x, y) {
     const p = 3;
 
-    // minion body
-    minion.forEach((r, ry) => {
+    mg_2_minion.forEach((r, ry) => {
       [...r].forEach((c, rx) => {
         if (c === "1") {
-          ctx.fillStyle = C.unityYellow;
-          ctx.fillRect((x + rx * p) * scale, (y + ry * p) * scale, p * scale, p * scale);
+          mg_2_ctx.fillStyle = mg_2_C.unityYellow;
+          mg_2_ctx.fillRect((x + rx * p) * mg_2_scale, (y + ry * p) * mg_2_scale, p * mg_2_scale, p * mg_2_scale);
         }
       });
     });
 
-    // goggles
-    ctx.fillStyle = "#ccc";
-    ctx.fillRect(3 * scale * p + x * scale, 3 * p * scale + y * scale, 2 * p * scale, p * scale);
-    ctx.fillRect(6 * scale * p + x * scale, 3 * p * scale + y * scale, 2 * p * scale, p * scale);
+    // Goggles
+    mg_2_ctx.fillStyle = "#ccc";
+    mg_2_ctx.fillRect(3 * mg_2_scale * p + x * mg_2_scale, 3 * p * mg_2_scale + y * mg_2_scale, 2 * p * mg_2_scale, p * mg_2_scale);
+    mg_2_ctx.fillRect(6 * mg_2_scale * p + x * mg_2_scale, 3 * p * mg_2_scale + y * mg_2_scale, 2 * p * mg_2_scale, p * mg_2_scale);
 
-    // eyes
-    ctx.fillStyle = "#000";
-    ctx.fillRect(4 * scale * p + x * scale, 4 * p * scale + y * scale, p * scale, p * scale);
-    ctx.fillRect(7 * scale * p + x * scale, 4 * p * scale + y * scale, p * scale, p * scale);
+    // Eyes
+    mg_2_ctx.fillStyle = "#000";
+    mg_2_ctx.fillRect(4 * mg_2_scale * p + x * mg_2_scale, 4 * p * mg_2_scale + y * mg_2_scale, p * mg_2_scale, p * mg_2_scale);
+    mg_2_ctx.fillRect(7 * mg_2_scale * p + x * mg_2_scale, 4 * p * mg_2_scale + y * mg_2_scale, p * mg_2_scale, p * mg_2_scale);
 
-    // legs animate
+    // Legs animate
     let leftLegX = 3 * p, rightLegX = 7 * p;
-    let legOffset = frame % 20 < 10 ? 0 : 2;
-    if (!gameOver && !finishAnim) {
-      ctx.fillStyle = C.unityBlue;
-      ctx.fillRect((leftLegX + legOffset) * scale + x * scale, (7 * p) * scale + y * scale, 2 * scale, 6 * scale);
-      ctx.fillRect((rightLegX + (10 - legOffset - 8)) * scale + x * scale, (7 * p) * scale + y * scale, 2 * scale, 6 * scale);
+    let legOffset = mg_2_frame % 20 < 10 ? 0 : 2;
+    if (!mg_2_gameOver && !mg_2_finishAnim) {
+      mg_2_ctx.fillStyle = mg_2_C.unityBlue;
+      mg_2_ctx.fillRect((leftLegX + legOffset) * mg_2_scale + x * mg_2_scale, (7 * p) * mg_2_scale + y * mg_2_scale, 2 * mg_2_scale, 6 * mg_2_scale);
+      mg_2_ctx.fillRect((rightLegX + (10 - legOffset - 8)) * mg_2_scale + x * mg_2_scale, (7 * p) * mg_2_scale + y * mg_2_scale, 2 * mg_2_scale, 6 * mg_2_scale);
     } else {
-      ctx.fillStyle = C.unityBlue;
-      ctx.fillRect((leftLegX) * scale + x * scale, (7 * p) * scale + y * scale, 2 * scale, 6 * scale);
-      ctx.fillRect((rightLegX) * scale + x * scale, (7 * p) * scale + y * scale, 2 * scale, 6 * scale);
+      mg_2_ctx.fillStyle = mg_2_C.unityBlue;
+      mg_2_ctx.fillRect((leftLegX) * mg_2_scale + x * mg_2_scale, (7 * p) * mg_2_scale + y * mg_2_scale, 2 * mg_2_scale, 6 * mg_2_scale);
+      mg_2_ctx.fillRect((rightLegX) * mg_2_scale + x * mg_2_scale, (7 * p) * mg_2_scale + y * mg_2_scale, 2 * mg_2_scale, 6 * mg_2_scale);
     }
   }
 
-  function update() {
-    if (!run) return;
-    frame++;
+  function mg_2_update() {
+    if (!mg_2_run) return;
+    mg_2_frame++;
 
-    if (!finishAnim) {
-      G.v += G.g;
-      G.y += G.v;
-      if (G.y > 0) { G.y = 0; G.v = 0; }
+    if (!mg_2_finishAnim) {
+      mg_2_G.v += mg_2_G.g;
+      mg_2_G.y += mg_2_G.v;
+      if (mg_2_G.y > 0) { mg_2_G.y = 0; mg_2_G.v = 0; }
 
-      if (!gameOver) {
-        G.obs.forEach(o => o.x -= G.speed);
-        G.bananas.forEach(b => b.x -= G.speed);
+      if (!mg_2_gameOver) {
+        mg_2_G.obs.forEach(o => o.x -= mg_2_G.speed);
+        mg_2_G.bananas.forEach(b => b.x -= mg_2_G.speed);
       }
 
-      if (G.obs[0]?.x < -20 && !gameOver) {
-        G.obs.shift();
-        spawnObstacle();
-        score++;
-        G.speed += 0.08;
-        beep(300);
+      if (mg_2_G.obs[0]?.x < -20 && !mg_2_gameOver) {
+        mg_2_G.obs.shift();
+        mg_2_spawnObstacle();
+        mg_2_score++;
+        mg_2_G.speed += 0.08;
+        mg_2_beep(300);
       }
 
-      G.obs.forEach(o => {
-        if (!gameOver && o.x < 70 && o.x + o.w > 40 && G.y === 0) {
-          gameOver = true;
-          beep(120, 0.2);
-          if (score > high) {
-            high = score;
-            localStorage.lgHS = high;
+      mg_2_G.obs.forEach(o => {
+        if (!mg_2_gameOver && o.x < 70 && o.x + o.w > 40 && mg_2_G.y === 0) {
+          mg_2_gameOver = true;
+          mg_2_beep(120, 0.2);
+          if (mg_2_score > mg_2_high) {
+            mg_2_high = mg_2_score;
+            localStorage.lgHS = mg_2_high;
           }
         }
       });
 
-      G.bananas = G.bananas.filter(b => {
-        if (!gameOver && b.x < 60 && b.x > 40 && G.y > -20) {
-          score += 5;
-          beep(800);
+      mg_2_G.bananas = mg_2_G.bananas.filter(b => {
+        if (!mg_2_gameOver && b.x < 60 && b.x > 40 && mg_2_G.y > -20) {
+          mg_2_score += 5;
+          mg_2_beep(800);
           return false;
         }
         return b.x > -20;
       });
 
-      if (prog >= 0.98 && !finishAnim) finishAnim = true;
+      if (mg_2_prog >= 0.98 && !mg_2_finishAnim) mg_2_finishAnim = true;
 
     } else {
-      finishFrame++;
-      G.y = -Math.sin(finishFrame * 0.1) * 20;
-      G.bananas.forEach(b => b.y -= 2);
-      if (finishFrame > 50) destroy();
+      mg_2_finishFrame++;
+      mg_2_G.y = -Math.sin(mg_2_finishFrame * 0.1) * 20;
+      mg_2_G.bananas?.forEach(b => b.y -= 2);
+      if (mg_2_finishFrame > 50) mg_2_destroy();
     }
   }
 
-  function draw() {
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  function mg_2_draw() {
+    mg_2_ctx.clearRect(0, 0, mg_2_canvasWidth, mg_2_canvasHeight);
 
-    if (!C.transparentBackground) {
-      ctx.fillStyle = "#111";
-      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    if (!mg_2_C.transparentBackground) {
+      mg_2_ctx.fillStyle = "#111";
+      mg_2_ctx.fillRect(0, 0, mg_2_canvasWidth, mg_2_canvasHeight);
     }
 
-    // loading text gradient
-    ctx.font = `${16*scale}px monospace`;
-    ctx.textAlign = "center";
-    ctx.lineWidth = 1*scale;
-    const gradient = ctx.createLinearGradient(0, 0, canvasWidth, 0);
+    mg_2_ctx.font = `${16*mg_2_scale}px monospace`;
+    mg_2_ctx.textAlign = "center";
+    mg_2_ctx.lineWidth = 1*mg_2_scale;
+    const gradient = mg_2_ctx.createLinearGradient(0, 0, mg_2_canvasWidth, 0);
     gradient.addColorStop(0, "#ff8c00");
     gradient.addColorStop(1, "#32cd32");
-    ctx.fillStyle = gradient;
-    ctx.strokeStyle = "#fff";
-    ctx.strokeText(`${C.loadText} ${Math.floor(prog*100)}%`, canvasWidth/2, 24*scale);
-    ctx.fillText(`${C.loadText} ${Math.floor(prog*100)}%`, canvasWidth/2, 24*scale);
+    mg_2_ctx.fillStyle = gradient;
+    mg_2_ctx.strokeStyle = "#fff";
+    mg_2_ctx.strokeText(`${mg_2_C.loadText} ${Math.floor(mg_2_prog*100)}%`, mg_2_canvasWidth/2, 24*mg_2_scale);
+    mg_2_ctx.fillText(`${mg_2_C.loadText} ${Math.floor(mg_2_prog*100)}%`, mg_2_canvasWidth/2, 24*mg_2_scale);
 
-    // ground
-    ctx.fillStyle = "#333";
-    ctx.fillRect(0, G.groundY*scale, G.w*scale, C.groundHeight*scale);
-    ctx.fillStyle = C.unityBlue;
-    ctx.fillRect(0, G.groundY*scale, G.w*prog*scale, C.groundHeight*scale);
+    // Ground
+    mg_2_ctx.fillStyle = "#333";
+    mg_2_ctx.fillRect(0, mg_2_G.groundY*mg_2_scale, mg_2_G.w*mg_2_scale, mg_2_C.groundHeight*mg_2_scale);
+    mg_2_ctx.fillStyle = mg_2_C.unityBlue;
+    mg_2_ctx.fillRect(0, mg_2_G.groundY*mg_2_scale, mg_2_G.w*mg_2_prog*mg_2_scale, mg_2_C.groundHeight*mg_2_scale);
 
-    drawMinion(40, G.groundY - 24 + G.y);
+    mg_2_drawMinion(40, mg_2_G.groundY - 24 + mg_2_G.y);
 
-    G.obs.forEach(o => {
-      const bounce = Math.sin(frame * 0.1 + o.offset) * 2;
-      ctx.fillStyle = C.obstacleColor;
-      ctx.fillRect(o.x*scale, (G.groundY - 16 + bounce)*scale, o.w*scale, 16*scale);
-      ctx.strokeStyle = "#800";
-      ctx.strokeRect(o.x*scale, (G.groundY - 16 + bounce)*scale, o.w*scale, 16*scale);
+    mg_2_G.obs.forEach(o => {
+      const bounce = Math.sin(mg_2_frame * 0.1 + o.offset) * 2;
+      mg_2_ctx.fillStyle = mg_2_C.obstacleColor;
+      mg_2_ctx.fillRect(o.x*mg_2_scale, (mg_2_G.groundY - 16 + bounce)*mg_2_scale, o.w*mg_2_scale, 16*mg_2_scale);
+      mg_2_ctx.strokeStyle = "#800";
+      mg_2_ctx.strokeRect(o.x*mg_2_scale, (mg_2_G.groundY - 16 + bounce)*mg_2_scale, o.w*mg_2_scale, 16*mg_2_scale);
     });
 
-    ctx.fillStyle = C.bananaColor;
-    G.bananas.forEach(b => ctx.fillRect(b.x*scale, b.y*scale, 6*scale, 10*scale));
+    mg_2_ctx.fillStyle = mg_2_C.bananaColor;
+    mg_2_G.bananas.forEach(b => mg_2_ctx.fillRect(b.x*mg_2_scale, b.y*mg_2_scale, 6*mg_2_scale, 10*mg_2_scale));
 
     // HUD
-    ctx.font = `${14*scale}px monospace`;
-    ctx.textAlign = "left";
-    ctx.lineWidth = 1*scale;
-    ctx.strokeStyle = "#fff";
-    ctx.fillStyle = C.unityYellow;
-    ctx.strokeText(`Score ${score}`, 10*scale, 16*scale);
-    ctx.fillText(`Score ${score}`, 10*scale, 16*scale);
-    ctx.strokeText(`Best ${high}`, 10*scale, 32*scale);
-    ctx.fillText(`Best ${high}`, 10*scale, 32*scale);
+    mg_2_ctx.font = `${14*mg_2_scale}px monospace`;
+    mg_2_ctx.textAlign = "left";
+    mg_2_ctx.lineWidth = 1*mg_2_scale;
+    mg_2_ctx.strokeStyle = "#fff";
+    mg_2_ctx.fillStyle = mg_2_C.unityYellow;
+    mg_2_ctx.strokeText(`Score ${mg_2_score}`, 10*mg_2_scale, 16*mg_2_scale);
+    mg_2_ctx.fillText(`Score ${mg_2_score}`, 10*mg_2_scale, 16*mg_2_scale);
+    mg_2_ctx.strokeText(`Best ${mg_2_high}`, 10*mg_2_scale, 32*mg_2_scale);
+    mg_2_ctx.fillText(`Best ${mg_2_high}`, 10*mg_2_scale, 32*mg_2_scale);
 
-    if (gameOver) {
-      ctx.font = `${18*scale}px monospace`;
-      ctx.textAlign = "center";
-      ctx.lineWidth = 1.5*scale;
-      ctx.strokeStyle = "#fff";
-      ctx.fillStyle = "#ff5555";
-      ctx.strokeText("GAME OVER", canvasWidth/2, 70*scale);
-      ctx.fillText("GAME OVER", canvasWidth/2, 70*scale);
-      ctx.strokeText("Tap to restart", canvasWidth/2, 90*scale);
-      ctx.fillText("Tap to restart", canvasWidth/2, 90*scale);
+    if (mg_2_gameOver) {
+      mg_2_ctx.font = `${18*mg_2_scale}px monospace`;
+      mg_2_ctx.textAlign = "center";
+      mg_2_ctx.lineWidth = 1.5*mg_2_scale;
+      mg_2_ctx.strokeStyle = "#fff";
+      mg_2_ctx.fillStyle = "#ff5555";
+      mg_2_ctx.strokeText("GAME OVER", mg_2_canvasWidth/2, 70*mg_2_scale);
+      mg_2_ctx.fillText("GAME OVER", mg_2_canvasWidth/2, 70*mg_2_scale);
+      mg_2_ctx.strokeText("Tap to restart", mg_2_canvasWidth/2, 90*mg_2_scale);
+      mg_2_ctx.fillText("Tap to restart", mg_2_canvasWidth/2, 90*mg_2_scale);
     }
   }
 
-  function resizeCanvas() {
-    canvasWidth = window.innerWidth;
-    canvasHeight = canvasWidth / ASPECT;
-    if(canvasHeight > window.innerHeight) {
-      canvasHeight = window.innerHeight - 40;
-      canvasWidth = canvasHeight * ASPECT;
+  function mg_2_resizeCanvas() {
+    mg_2_canvasWidth = window.innerWidth;
+    mg_2_canvasHeight = mg_2_canvasWidth / mg_2_ASPECT;
+    if(mg_2_canvasHeight > window.innerHeight) {
+      mg_2_canvasHeight = window.innerHeight - 40;
+      mg_2_canvasWidth = mg_2_canvasHeight * mg_2_ASPECT;
     }
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-    scale = canvasWidth / G.w;
-    canvas.style.left = `${(window.innerWidth - canvasWidth)/2}px`;
-    canvas.style.bottom = '20px';
+    mg_2_canvas.width = mg_2_canvasWidth;
+    mg_2_canvas.height = mg_2_canvasHeight;
+    mg_2_scale = mg_2_canvasWidth / mg_2_G.w;
+    mg_2_canvas.style.left = `${(window.innerWidth - mg_2_canvasWidth)/2}px`;
+    mg_2_canvas.style.bottom = '20px';
   }
 
-  function loop() {
-    update();
-    draw();
-    raf = requestAnimationFrame(loop);
+  function mg_2_loop() {
+    mg_2_update();
+    mg_2_draw();
+    mg_2_raf = requestAnimationFrame(mg_2_loop);
   }
 
-  function destroy() {
-    run = false;
-    cancelAnimationFrame(raf);
-    canvas?.remove();
-    audio?.close();
+  function mg_2_destroy() {
+    mg_2_run = false;
+    cancelAnimationFrame(mg_2_raf);
+    mg_2_canvas?.remove();
+    mg_2_audio?.close();
   }
 
-  canvas = document.createElement("canvas");
-  canvas.style.cssText = "position:fixed;bottom:20px;z-index:9999;pointer-events:auto";
-  document.body.appendChild(canvas);
-  ctx = canvas.getContext("2d");
+  mg_2_canvas = document.createElement("canvas");
+  mg_2_canvas.style.cssText = "position:fixed;bottom:20px;z-index:9999;pointer-events:auto";
+  document.body.appendChild(mg_2_canvas);
+  mg_2_ctx = mg_2_canvas.getContext("2d");
 
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
-  canvas.addEventListener("pointerdown", jump);
-  window.addEventListener("keydown", jump);
+  window.addEventListener('resize', mg_2_resizeCanvas);
+  mg_2_resizeCanvas();
+  mg_2_canvas.addEventListener("pointerdown", mg_2_jump);
+  window.addEventListener("keydown", mg_2_jump);
 
-  reset();
-  loop();
+  mg_2_reset();
+  mg_2_loop();
 
-  function updateProgressFromDOM() {
+  function mg_2_updateProgressFromDOM() {
     const bar = document.querySelector("#unity-progress-bar-full");
     if (bar) {
       const w = parseFloat(bar.style.width) || 0;
-      prog = Math.min(Math.max(w/100, 0), 1);
+      mg_2_prog = Math.min(Math.max(w/100, 0), 1);
     }
   }
-  setInterval(updateProgressFromDOM, 50);
+  setInterval(mg_2_updateProgressFromDOM, 50);
 
-  window.destroyLoaderGame = destroy;
+  window.destroyLoaderGame = mg_2_destroy;
 })();
