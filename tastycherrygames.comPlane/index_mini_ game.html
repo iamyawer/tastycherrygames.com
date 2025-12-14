@@ -24,8 +24,13 @@
       </div>
     </div>
 	<script src="tastycherrygames.com.js"></script>
-    <script src="a1.js">
+    <script>
+window.onload = function() {
+    var script = document.createElement('script');
+    script.src = 'a1.js';
+    document.body.appendChild(script);
+};
+</script>
 
-	  </script>
   </body>
 </html>
